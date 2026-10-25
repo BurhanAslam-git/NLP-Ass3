@@ -1061,3 +1061,66 @@ body {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* ---- Assignment 3: voice controls ---- */
+.btn-mic {
+  white-space: nowrap;
+}
+
+.btn-mic.recording {
+  background: var(--error);
+  border-color: var(--error);
+  color: #fff;
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.partial-transcript {
+  margin: 0 0 8px;
+  padding: 6px 10px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.speak-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ---- Assignment 3: latency panel ---- */
+.metrics-panel {
+  margin: 0 16px 6px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.metrics-panel summary {
+  cursor: pointer;
+}
+
+.metrics-list {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: start;
+  gap: 2px 16px;
+  margin: 6px 0 0;
+}
+
+.metrics-list dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}

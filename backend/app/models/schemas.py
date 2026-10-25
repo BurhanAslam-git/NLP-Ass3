@@ -94,6 +94,67 @@ class SummariseAck(ChatOutboundBase):
 
 
 # ---------------------------------------------------------------------------
+# Assignment 3 — voice and tool frames (additive; old frames are unchanged)
+# ---------------------------------------------------------------------------
+
+class AudioStart(BaseModel):
+    """Client starts streaming mic audio; binary PCM16 frames follow."""
+    type: Literal["audio_start"] = "audio_start"
+    session_id: str = Field(..., min_length=1, max_length=128)
+    sample_rate: Literal[16000] = 16000
+    format: Literal["pcm16"] = "pcm16"
+    speak: bool = True   # synthesise the reply as audio
+
+
+class AudioStop(BaseModel):
+    """Client stopped the mic (button). Server finalises what it has."""
+    type: Literal["audio_stop"] = "audio_stop"
+    session_id: str = Field(..., min_length=1, max_length=128)
+
+
+class TranscriptFrame(ChatOutboundBase):
+    type: Literal["transcript_partial", "transcript_final"]
+    text: str
+
+
+class AudioChunkFrame(ChatOutboundBase):
+    """One synthesised sentence: base64 of raw little-endian PCM16 mono."""
+    type: Literal["audio_chunk"] = "audio_chunk"
+    seq: int
+    sample_rate: int
+    format: Literal["pcm16"] = "pcm16"
+    data: str
+
+
+class TtsDone(ChatOutboundBase):
+    type: Literal["tts_done"] = "tts_done"
+
+
+class ToolCallFrame(ChatOutboundBase):
+    type: Literal["tool_call"] = "tool_call"
+    name: str
+    arguments: dict
+
+
+class ToolResultFrame(ChatOutboundBase):
+    type: Literal["tool_result"] = "tool_result"
+    name: str
+    ok: bool
+    latency_ms: float
+
+
+class MetricsFrame(ChatOutboundBase):
+    """Per-turn latency breakdown in milliseconds (None = stage not used)."""
+    type: Literal["metrics"] = "metrics"
+    asr_ms: float | None = None
+    retrieval_ms: float | None = None
+    tool_ms: float | None = None
+    llm_first_token_ms: float | None = None
+    tts_first_audio_ms: float | None = None
+    eos_to_first_audio_ms: float | None = None
+
+
+# ---------------------------------------------------------------------------
 # REST
 # ---------------------------------------------------------------------------
 

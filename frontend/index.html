@@ -93,6 +93,11 @@
           </button>
         </div>
 
+        <details id="metrics-panel" class="metrics-panel">
+          <summary>Latency (last turn)</summary>
+          <dl id="metrics-list" class="metrics-list"><dt>No turns yet</dt><dd></dd></dl>
+        </details>
+
         <div id="system-banner" class="system-banner" role="status" aria-live="polite" hidden></div>
 
         <main id="message-list" class="messages" aria-live="polite"></main>
@@ -101,6 +106,7 @@
         </div>
 
         <footer class="composer" id="composer">
+          <p id="partial-transcript" class="partial-transcript" hidden aria-live="polite"></p>
           <form id="chat-form">
             <label class="sr-only" for="user-input">Message</label>
             <textarea
@@ -110,9 +116,14 @@
               autocomplete="off"
               maxlength="4000"
             ></textarea>
+            <button type="button" id="mic-btn" class="btn btn-mic" title="Speak your question" aria-pressed="false">🎤 Speak</button>
             <button type="submit" id="send-btn" class="btn btn-primary">Send</button>
           </form>
           <div class="composer-meta">
+            <label class="speak-toggle" title="Read voice replies aloud with the local TTS voice">
+              <input type="checkbox" id="speak-toggle" checked /> Speak replies
+            </label>
+            <button type="button" id="stop-audio-btn" class="btn btn-sm" hidden>⏹ Stop audio</button>
             <p class="hint" id="composer-disclaimer">NUCES Virtual Desk can make mistakes so cross check first.</p>
             <p id="char-count" class="char-count" aria-live="polite">0 / 4000</p>
           </div>
@@ -158,6 +169,7 @@
 
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-    <script src="/assets/app.js?v=11"></script>
+    <script src="/assets/voice.js?v=1"></script>
+    <script src="/assets/app.js?v=12"></script>
   </body>
 </html>

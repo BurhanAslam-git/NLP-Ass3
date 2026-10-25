@@ -160,7 +160,8 @@ def run_indexer() -> None:
         return
 
     logger.info("Loading embedding model all-MiniLM-L6-v2 ...")
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    from backend.app.config import settings
+    model = SentenceTransformer(settings.embedding_model_path())
 
     logger.info("Opening ChromaDB at %s ...", CHROMA_DIR)
     client = chromadb.PersistentClient(path=CHROMA_DIR)

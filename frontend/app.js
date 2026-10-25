@@ -8,7 +8,9 @@
   const MAX_CHARS = 4000;
   const REPLY_TIMEOUT_MS = 125000;
   const HEALTH_POLL_MS = 30000;
-  const STREAM_IDLE_MS = 600;
+  // Safety net only: the reply normally ends on the server's "done" frame.
+  // (Was 600 ms, which cut replies off whenever the CPU model paused or ran a tool.)
+  const STREAM_IDLE_MS = 20000;
   const MAX_STORED_CONVERSATIONS = 48;
 
   const messageList = document.getElementById("message-list");
@@ -51,6 +53,12 @@
   const sourceTitleDisplay = document.getElementById("source-title-display");
   const sourceContentDisplay = document.getElementById("source-content-display");
 
+  // Ass 3 voice elements
+  const micBtn = document.getElementById("mic-btn");
+  const partialTranscript = document.getElementById("partial-transcript");
+  const speakToggle = document.getElementById("speak-toggle");
+  const stopAudioBtn = document.getElementById("stop-audio-btn");
+
   const STARTERS = [
     "Is Speech and Language Processing by Jurafsky available, and where is it located?",
     "What are the overdue fines for regular circulating books versus reserved textbooks?",
@@ -80,6 +88,29 @@
   let manualDisconnect = false;
   let openChatMenuEl = null;
   let modalResolver = null;
+
+  // Voice: mic capture + reply playback (see voice.js)
+  const voice = window.createVoice({
+    getSocket: function () {
+      return socket;
+    },
+    getSessionId: function () {
+      return sessionId;
+    },
+    onRecordingChange: function (recording) {
+      micBtn.classList.toggle("recording", recording);
+      micBtn.setAttribute("aria-pressed", recording ? "true" : "false");
+      micBtn.textContent = recording ? "⏺ Stop" : "🎤 Speak";
+      input.disabled = recording || streaming;
+      if (recording) {
+        showPartial("Listening… speak now. I'll stop when you pause.");
+      }
+    },
+    onError: function (msg) {
+      showPartial("");
+      appendMessage("error", msg, { extraClass: "message-error" });
+    },
+  });
 
   function defaultGreeting() {
     return libraryInfo && libraryInfo.greeting
@@ -145,9 +176,38 @@
     thinkingEl.hidden = !visible;
   }
 
+  // Latency panel: one row per pipeline stage of the last turn (ms).
+  const METRIC_LABELS = {
+    asr_ms: "ASR (end of speech → final transcript)",
+    retrieval_ms: "Retrieval (RAG)",
+    tool_ms: "Tools",
+    llm_first_token_ms: "LLM first token",
+    tts_first_audio_ms: "TTS first sentence",
+    eos_to_first_audio_ms: "End of speech → first audio",
+  };
+
+  function showMetrics(data) {
+    const list = document.getElementById("metrics-list");
+    list.innerHTML = "";
+    Object.keys(METRIC_LABELS).forEach(function (key) {
+      const dt = document.createElement("dt");
+      dt.textContent = METRIC_LABELS[key];
+      const dd = document.createElement("dd");
+      dd.textContent = data[key] === null || data[key] === undefined ? "—" : Math.round(data[key]) + " ms";
+      list.appendChild(dt);
+      list.appendChild(dd);
+    });
+  }
+
+  function showPartial(text) {
+    partialTranscript.hidden = !text;
+    partialTranscript.textContent = text || "";
+  }
+
   function setStreamingControls(active) {
     sendBtn.disabled = active || !canSend();
     input.disabled = active;
+    micBtn.disabled = active;
     if (btnSummarise) {
       btnSummarise.disabled = active;
     }
@@ -899,6 +959,59 @@
       return;
     }
 
+    // ---- Assignment 3: voice + tool events (all additive) ----
+    if (data.type === "transcript_partial") {
+      if (voice.isRecording()) showPartial("… " + data.text);
+      return;
+    }
+
+    if (data.type === "transcript_final") {
+      // Server detected end of speech. From here the turn is exactly like a typed one.
+      voice.stopMic(false);
+      showPartial("");
+      beginTurn(data.text);
+      return;
+    }
+
+    if (data.type === "audio_chunk") {
+      if (data.session_id !== sessionId) return;
+      if (speakToggle.checked) {
+        stopAudioBtn.hidden = false;
+        voice.playChunk(data);
+      }
+      return;
+    }
+
+    if (data.type === "tts_done") {
+      return;
+    }
+
+    if (data.type === "metrics") {
+      showMetrics(data);
+      return;
+    }
+
+    if (data.type === "tool_call") {
+      if (streaming) {
+        thinkingLabel.textContent = "Using " + data.name + "…";
+        thinkingEl.hidden = false;
+      }
+      return;
+    }
+
+    if (data.type === "tool_result") {
+      if (streaming) thinkingLabel.textContent = assistantThinkingLabel();
+      return;
+    }
+
+    if (data.type === "error" && (voice.isRecording() || !partialTranscript.hidden)) {
+      // ASR problem (e.g. nothing heard) before a turn started.
+      voice.stopMic(false);
+      showPartial("");
+      appendMessage("error", data.message || "Voice error.", { extraClass: "message-error" });
+      return;
+    }
+
     if (data.type === "token") {
       if (!streaming || !belongsToInflight(data)) {
         return;
@@ -1059,6 +1172,22 @@
     }, REPLY_TIMEOUT_MS);
   }
 
+  // Shared by typed and spoken turns: show the user bubble and wait for the reply.
+  function beginTurn(text) {
+    maybeAutoTitleFromFirstMessage(text);
+
+    activeRequestId += 1;
+    const requestId = activeRequestId;
+    inflightSessionId = sessionId;
+    streaming = true;
+    streamingAssistantBody = null;
+    streamingMessageEl = null;
+    setThinking(true);
+    setStreamingControls(true);
+    appendMessage("user", text);
+    startReplyTimer(requestId);
+  }
+
   function sendUserMessage(text) {
     if (!text || text.length > MAX_CHARS) {
       appendMessage("error", "Message must be between 1 and 4000 characters.", { extraClass: "message-error" });
@@ -1076,19 +1205,7 @@
       setBanner("Model is not ready. Replies may fail until Ollama is running.", "warn");
     }
 
-    maybeAutoTitleFromFirstMessage(text);
-
-    activeRequestId += 1;
-    const requestId = activeRequestId;
-    inflightSessionId = sessionId;
-    streaming = true;
-    streamingAssistantBody = null;
-    streamingMessageEl = null;
-    setThinking(true);
-    setStreamingControls(true);
-    appendMessage("user", text);
-    startReplyTimer(requestId);
-
+    beginTurn(text);
     socket.send(
       JSON.stringify({
         type: "user_message",
@@ -1278,6 +1395,32 @@
     updateCharCount();
     sendUserMessage(text);
   });
+
+  micBtn.addEventListener("click", function () {
+    if (voice.isRecording()) {
+      voice.stopMic(true); // user pressed Stop: server finalises what it has
+    } else if (!streaming) {
+      voice.stopPlayback();
+      voice.startMic(speakToggle.checked);
+    }
+  });
+
+  stopAudioBtn.addEventListener("click", function () {
+    voice.stopPlayback();
+    stopAudioBtn.hidden = true;
+  });
+
+  speakToggle.addEventListener("change", function () {
+    if (!speakToggle.checked) {
+      voice.stopPlayback();
+      stopAudioBtn.hidden = true;
+    }
+  });
+
+  // Hide the Stop button once the queued reply audio has finished playing.
+  setInterval(function () {
+    if (!stopAudioBtn.hidden && !voice.isPlaying()) stopAudioBtn.hidden = true;
+  }, 500);
 
   newSessionBtn.addEventListener("click", function () {
     createNewChat(false);

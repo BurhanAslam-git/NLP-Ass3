@@ -9,3 +9,8 @@ __pycache__/
 .pytest_cache/
 logs/*.log
 *.tmp
+/models/
+pip_install.log
+data/library_records.tmp
+indexer.log
+ollama_pull.log

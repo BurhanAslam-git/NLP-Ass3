@@ -6,3 +6,11 @@ pydantic-settings>=2.6.0
 sentence-transformers>=3.0.0
 chromadb>=0.5.0
 pytest>=8.0.0
+pytest-asyncio==1.4.0
+
+# Assignment 3 — local voice pipeline (pinned)
+faster-whisper==1.2.1      # ASR (CTranslate2 Whisper, int8 on CPU)
+piper-tts==1.8.0           # TTS (Piper VITS voices, ONNX)
+onnxruntime==1.31.0        # runs Silero VAD (and Piper)
+numpy>=1.26
+websockets>=13.0           # client used by scripts/benchmark_voice.py

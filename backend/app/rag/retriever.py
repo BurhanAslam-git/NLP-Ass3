@@ -90,7 +90,7 @@ class LibraryRetriever:
             import chromadb  # type: ignore
 
             logger.info("Loading embedding model all-MiniLM-L6-v2 ...")
-            self._model = SentenceTransformer("all-MiniLM-L6-v2")
+            self._model = SentenceTransformer(settings.embedding_model_path())
 
             chroma_path = str(Path(settings.rag_chroma_dir).resolve())
             logger.info("Opening ChromaDB at %s ...", chroma_path)
@@ -179,11 +179,16 @@ class LibraryRetriever:
         kept: list[RetrievedChunk] = []
         for chunk in chunks:
             if total_chars + len(chunk.content) > settings.rag_max_chars:
+                if not kept:  # always keep the best chunk, cut to the budget
+                    chunk.content = chunk.content[: settings.rag_max_chars]
+                    kept.append(chunk)
                 break
             kept.append(chunk)
             total_chars += len(chunk.content)
 
-        confidence = _confidence_band(kept)
+        # Confidence uses ALL retrieved chunks (top-1 vs top-2 gap), not just
+        # the ones that fit the character budget.
+        confidence = _confidence_band(chunks)
         return RetrievalResult(chunks=kept, confidence=confidence, latency_ms=latency_ms)
 
     # ------------------------------------------------------------------

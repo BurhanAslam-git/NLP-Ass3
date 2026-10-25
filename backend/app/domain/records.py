@@ -192,7 +192,8 @@ class RecordsDatabase:
             "query": query,
             "count": len(results),
             "results": results,
-            "message": "" if results else f"No catalogue items match '{query}'.",
+            "message": "; ".join(f"{r['title']} ({r['status']}, {r['location']})" for r in results)
+            or f"No catalogue items match '{query}'.",
         }
 
     async def find_book(self, identifier: str) -> dict[str, Any] | None:

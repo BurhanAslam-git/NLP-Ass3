@@ -24,7 +24,7 @@
       "author": "F. Scott Fitzgerald",
       "location": "Fiction / FIC FIT",
       "status": "checked_out",
-      "due_date": "2026-12-30",
+      "due_date": "2026-10-28",
       "borrowed_by": "P-78421"
     },
     {
@@ -371,8 +371,8 @@
         {
           "item_id": "BK-1003",
           "title": "The Great Gatsby",
-          "due_date": "2026-12-30",
-          "renewals_used": 1
+          "due_date": "2026-10-28",
+          "renewals_used": 0
         },
         {
           "item_id": "BK-1010",
@@ -395,16 +395,10 @@
           "renewals_used": 0
         }
       ]
-    },
-    "P-99999": {
-      "card_number": "P-99999",
-      "name": "Patron (P-99999)",
-      "status": "active",
-      "loans": []
     }
   },
   "metadata": {
-    "updated_at": "2026-10-25T22:04:13.581695",
+    "updated_at": "2026-10-25T22:54:21.775442",
     "total_books": 40
   }
 }

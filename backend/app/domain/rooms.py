@@ -133,14 +133,14 @@ async def book_study_room(
         # ---------------------------------------------------- list_availability
         if action == "list_availability":
             rooms = [room] if room else list(ROOMS)
+            free = {r: _free_slots(day.isoformat(), r, bookings, open_m, close_m) for r in rooms}
             return {
                 "success": True,
                 "date": day.isoformat(),
                 "opening_hours": f"{open_t:%H:%M}-{close_t:%H:%M}",
-                "rooms": [
-                    {"room_id": r, **ROOMS[r], "free": _free_slots(day.isoformat(), r, bookings, open_m, close_m)}
-                    for r in rooms
-                ],
+                "rooms": [{"room_id": r, **ROOMS[r], "free": free[r]} for r in rooms],
+                "message": f"Free times on {day.isoformat()}: "
+                           + "; ".join(f"room {r}: {', '.join(f) or 'fully booked'}" for r, f in free.items()),
             }
 
         # ----------------------------------------------------------------- book

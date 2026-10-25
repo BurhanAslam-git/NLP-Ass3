@@ -26,7 +26,8 @@ SUSPENSION_ABOVE_PKR = 100
 
 def _parse(value: str, field: str) -> date:
     try:
-        return date.fromisoformat(value.strip())
+        # Small LLMs sometimes send "2026-10-18T00:00Z": keep just the date part.
+        return date.fromisoformat(value.strip()[:10])
     except (ValueError, AttributeError):
         raise ValueError(f"{field} must be a date in YYYY-MM-DD format, got {value!r}.")
 
@@ -66,6 +67,8 @@ async def calculate_fine(due_date: str, return_date: str | None = None, item_typ
         "borrowing_suspended": fine > SUSPENSION_ABOVE_PKR,
         "declared_lost": declared_lost,
         "policy": "POL-002 Overdue Fines Policy",
+        # Plain sentence for the LLM to repeat (small models misread JSON numbers).
+        "message": f"The fine is PKR {fine}. {breakdown}",
     }
     if declared_lost:
         minimum_total = LOST_MIN_REPLACEMENT_PKR + LOST_PROCESSING_FEE_PKR + fine

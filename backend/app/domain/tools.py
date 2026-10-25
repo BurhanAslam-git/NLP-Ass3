@@ -25,7 +25,7 @@ from backend.app.domain.rooms import book_study_room
 logger = logging.getLogger(__name__)
 
 # Descriptions are kept short: every token here is re-read by the LLM on every turn.
-_CARD = {"type": "string", "description": "Card number, e.g. P-78421"}
+_CARD = {"type": "string", "description": "The card number the patron gave (format P-12345). Never guess it."}
 _BOOK = {"type": "string", "description": "Book title or ID, e.g. BK-1003"}
 
 # name -> {"description", "parameters" (JSON schema), "handler"}
@@ -49,8 +49,8 @@ TOOLS: dict[str, dict[str, Any]] = {
         "parameters": {
             "type": "object",
             "properties": {
-                "due_date": {"type": "string", "description": "YYYY-MM-DD"},
-                "return_date": {"type": "string", "description": "YYYY-MM-DD, default today"},
+                "due_date": {"type": "string", "description": "Date the item was due, as the patron said, YYYY-MM-DD"},
+                "return_date": {"type": "string", "description": "YYYY-MM-DD; omit if returning today"},
                 "item_type": {"type": "string", "description": "book or reference"},
             },
             "required": ["due_date"],
@@ -66,8 +66,8 @@ TOOLS: dict[str, dict[str, Any]] = {
                 "card_number": _CARD,
                 "room_id": {"type": "string", "description": "301-306"},
                 "date": {"type": "string", "description": "YYYY-MM-DD"},
-                "start_time": {"type": "string", "description": "HH:MM 24h"},
-                "duration_minutes": {"type": "integer"},
+                "start_time": {"type": "string", "description": "HH:MM 24h, required to book"},
+                "duration_minutes": {"type": "integer", "description": "required to book"},
                 "booking_id": {"type": "string"},
             },
             "required": ["action"],
@@ -75,7 +75,7 @@ TOOLS: dict[str, dict[str, Any]] = {
         "handler": book_study_room,
     },
     "check_patron_loans": {
-        "description": "A patron's current loans and due dates.",
+        "description": "The patron's OWN current loans, only if they gave their card number. Not for 'do you have <book>'.",
         "parameters": {"type": "object", "properties": {"card_number": _CARD}, "required": ["card_number"]},
         "handler": lambda card_number: records_db.check_patron_loans(card_number=card_number),
     },

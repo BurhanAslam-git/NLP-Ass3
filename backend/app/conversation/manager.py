@@ -414,13 +414,14 @@ class ConversationManager:
                 session_facts=state.facts or None,
             )
 
-            # Append per-turn notes (date, patron hint) to the END of the last user
+            # Add per-turn notes (date, patron hint) to the last user
             # message. A3: they used to be an extra system message, but the chat
             # template merges system messages into the top of the prompt, so the
             # changing time invalidated Ollama's prompt cache (~15 s per turn).
             if extra_notes and payload and payload[-1]["role"] == "user":
                 hint_content = "\n\n".join(extra_notes)
-                payload[-1] = {"role": "user", "content": f"{payload[-1]['content']}\n\n[NOTE: {hint_content}]"}
+                # Put the note BEFORE the question: small models tend to echo text at the end.
+                payload[-1] = {"role": "user", "content": f"({hint_content})\n\n{payload[-1]['content']}"}
 
             # --- LLM turn with tool calling (Assignment 3) ---
             # The LLM itself decides whether a tool is needed (Ollama native

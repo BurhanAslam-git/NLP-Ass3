@@ -160,9 +160,9 @@ _CONFIDENCE_NUDGE: dict[str, str] = {
 }
 
 _FALLBACK_NOTE = (
-    "[No relevant library documents were found for this query in the corpus. "
-    "Clearly inform the patron that no relevant records or documents were found in the library system, "
-    "and politely offer to assist with catalogue search by keyword, borrowing policies, or patron loans. "
+    "[No relevant library documents were found for this query. "
+    "If one of your tools can answer it (catalogue search, fines, study rooms, loans), call the tool. "
+    "Otherwise tell the patron no relevant records were found and offer catalogue, policy or loan help. "
     "Do NOT fabricate or guess an answer.]"
 )
 

@@ -109,6 +109,16 @@ class OllamaEngine:
                         if token:
                             yield token
                         if data.get("done"):
+                            # Ollama's own timing: how many prompt tokens it had to read
+                            # (vs. reuse from its cache) and how fast it generated.
+                            logger.info(
+                                "Ollama: prompt %s tok in %.2f s, generated %s tok in %.2f s (tools=%s)",
+                                data.get("prompt_eval_count"),
+                                (data.get("prompt_eval_duration") or 0) / 1e9,
+                                data.get("eval_count"),
+                                (data.get("eval_duration") or 0) / 1e9,
+                                bool(tools),
+                            )
                             break
         except httpx.HTTPError as exc:
             if attempt == 1:
@@ -124,10 +134,11 @@ class OllamaEngine:
                     "Cannot reach Ollama. Start it with: ollama serve"
                 ) from exc
 
-    async def warm_up(self, messages: list[dict[str, Any]]) -> None:
+    async def warm_up(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None) -> None:
         """
         Load the model into RAM at startup and let Ollama cache the system
-        prompt, so the first real turn does not pay the load time.
+        prompt + tool schemas (the fixed start of every request), so real
+        turns only pay for the new tokens.
         """
         body = {
             "model": self._model,
@@ -136,6 +147,8 @@ class OllamaEngine:
             "keep_alive": settings.ollama_keep_alive,
             "options": {"num_predict": 1, "num_ctx": settings.ollama_num_ctx},
         }
+        if tools:
+            body["tools"] = tools
         async with httpx.AsyncClient(timeout=httpx.Timeout(300.0)) as client:
             resp = await client.post(f"{self._base}/api/chat", json=body)
             resp.raise_for_status()

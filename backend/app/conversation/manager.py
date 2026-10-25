@@ -51,6 +51,7 @@ from backend.app.models.schemas import (
 )
 from backend.app.domain.records import records_db
 from backend.app.conversation.tool_orchestrator import chat_with_tools
+from backend.app.domain.tools import tool_specs
 from backend.app.rag.retriever import LibraryRetriever
 from backend.app.rag.schemas import RetrievalResult
 
@@ -101,7 +102,8 @@ class ConversationManager:
             logger.warning("Retriever warm-up failed: %s", exc)
         try:
             await self._llm.warm_up(
-                [{"role": "system", "content": build_system_prompt()}, {"role": "user", "content": "hi"}]
+                [{"role": "system", "content": build_system_prompt()}, {"role": "user", "content": "hi"}],
+                tools=tool_specs(),
             )
         except Exception as exc:
             logger.warning("LLM warm-up failed: %s", exc)
@@ -412,10 +414,13 @@ class ConversationManager:
                 session_facts=state.facts or None,
             )
 
-            # Append any extra notes (patron hint) right before the last user message
+            # Append per-turn notes (date, patron hint) to the END of the last user
+            # message. A3: they used to be an extra system message, but the chat
+            # template merges system messages into the top of the prompt, so the
+            # changing time invalidated Ollama's prompt cache (~15 s per turn).
             if extra_notes and payload and payload[-1]["role"] == "user":
                 hint_content = "\n\n".join(extra_notes)
-                payload.insert(-1, {"role": "system", "content": f"SYSTEM NOTE:\n{hint_content}"})
+                payload[-1] = {"role": "user", "content": f"{payload[-1]['content']}\n\n[NOTE: {hint_content}]"}
 
             # --- LLM turn with tool calling (Assignment 3) ---
             # The LLM itself decides whether a tool is needed (Ollama native

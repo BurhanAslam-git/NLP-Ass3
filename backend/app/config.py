@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # RAG
     rag_top_k: int = 5
     rag_similarity_threshold: float = 0.30
-    rag_max_chars: int = 1200        # max chars of RAG context per turn (A3: was 2000; less to read = faster)
+    rag_max_chars: int = 800         # max chars of RAG context per turn (A3: was 2000; less to read = faster)
     rag_chroma_dir: str = "data/chroma_db"
     rag_documents_dir: str = "data/documents"
     rag_collection: str = "library_v1"

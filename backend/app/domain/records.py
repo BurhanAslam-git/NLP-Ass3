@@ -7,9 +7,11 @@ and returning books, with persistent writes to data/library_records.json.
 from __future__ import annotations
 
 import asyncio
+import copy
 import json
 import logging
 import os
+import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -18,109 +20,39 @@ logger = logging.getLogger(__name__)
 
 RECORDS_PATH = Path("data/library_records.json")
 
-# Initial seed data if file does not exist
-INITIAL_CATALOGUE = [
-    {
-        "id": "BK-1001",
-        "title": "Introduction to Algorithms",
-        "author": "Cormen, Leiserson, Rivest, Stein",
-        "location": "Stacks A / QA76.9.A43",
-        "status": "available",
-        "due_date": None,
-        "borrowed_by": None,
-        "category": "computer_science",
-    },
-    {
-        "id": "BK-1002",
-        "title": "Speech and Language Processing",
-        "author": "Daniel Jurafsky, James H. Martin",
-        "location": "Stacks B / P98",
-        "status": "available",
-        "due_date": None,
-        "borrowed_by": None,
-        "category": "nlp_ai",
-    },
-    {
-        "id": "BK-1003",
-        "title": "The Great Gatsby",
-        "author": "F. Scott Fitzgerald",
-        "location": "Fiction / FIC FIT",
-        "status": "checked_out",
-        "due_date": "2026-09-22",
-        "borrowed_by": "P-78421",
-        "category": "fiction",
-    },
-    {
-        "id": "BK-1004",
-        "title": "Clean Code",
-        "author": "Robert C. Martin",
-        "location": "Stacks A / QA76.73",
-        "status": "available",
-        "due_date": None,
-        "borrowed_by": None,
-        "category": "software_engineering",
-    },
-    {
-        "id": "BK-1005",
-        "title": "Pride and Prejudice",
-        "author": "Jane Austen",
-        "location": "Fiction / FIC AUS",
-        "status": "on_hold",
-        "due_date": None,
-        "borrowed_by": None,
-        "category": "fiction",
-    },
-    {
-        "id": "BK-1006",
-        "title": "Deep Learning",
-        "author": "Goodfellow, Bengio, Courville",
-        "location": "Reference (library use only)",
-        "status": "reference_only",
-        "due_date": None,
-        "borrowed_by": None,
-        "category": "ai_ml",
-    },
-    {
-        "id": "BK-1010",
-        "title": "Database System Concepts",
-        "author": "Silberschatz, Korth, Sudarshan",
-        "location": "Stacks A / QA76.9.D3",
-        "status": "checked_out",
-        "due_date": "2026-09-18",
-        "borrowed_by": "P-78421",
-        "category": "databases",
-    },
-    {
-        "id": "BK-1011",
-        "title": "Design Patterns",
-        "author": "Gamma, Helm, Johnson, Vlissides",
-        "location": "Stacks A / QA76.76.D47",
-        "status": "available",
-        "due_date": None,
-        "borrowed_by": None,
-        "category": "software_engineering",
-    },
-    {
-        "id": "BK-1018",
-        "title": "Pattern Recognition and Machine Learning",
-        "author": "Christopher M. Bishop",
-        "location": "Stacks B / Q325.5",
-        "status": "available",
-        "due_date": None,
-        "borrowed_by": None,
-        "category": "ai_ml",
-    },
-    {
-        "id": "BK-1021",
-        "title": "The Pragmatic Programmer",
-        "author": "David Thomas, Andrew Hunt",
-        "location": "Stacks A / QA76.6",
-        "status": "available",
-        "due_date": None,
-        "borrowed_by": None,
-        "category": "software_engineering",
-    },
-]
+DOCUMENTS_DIR = Path("data/documents")
+
+
+def build_catalogue_from_documents(docs_dir: Path = DOCUMENTS_DIR) -> list[dict[str, Any]]:
+    """
+    Seed catalogue = the 40 BK-* documents' headers (title, author, shelf,
+    status, due date). RAG indexes the same files, so the live catalogue and
+    the retrieved documents always agree.
+    """
+    books = []
+    for path in sorted(docs_dir.glob("BK-*.md")):
+        header = path.read_text(encoding="utf-8").split("---")[1]
+        meta = {}
+        for line in header.strip().splitlines():
+            key, _, value = line.partition(":")
+            meta[key.strip()] = value.strip()
+        books.append({
+            "id": meta["doc_id"],
+            "title": meta["title"],
+            "author": meta.get("author", ""),
+            "location": meta.get("location", ""),
+            "status": meta.get("status", "available"),
+            "due_date": meta.get("due_date"),
+            "borrowed_by": None,
+        })
+    # Link checked-out books to the sample patrons who hold them.
+    for card, patron in INITIAL_PATRONS.items():
+        for loan in patron["loans"]:
+            for book in books:
+                if book["id"] == loan["item_id"]:
+                    book["borrowed_by"] = card
+    return books
+
 
 INITIAL_PATRONS = {
     "P-78421": {
@@ -129,20 +61,19 @@ INITIAL_PATRONS = {
         "email": "alex.rivera@nu.edu.pk",
         "status": "active",
         "loans": [
-            {
-                "item_id": "BK-1003",
-                "title": "The Great Gatsby",
-                "due_date": "2026-10-18",
-                "renewals_used": 0,
-            },
-            {
-                "item_id": "BK-1010",
-                "title": "Database System Concepts",
-                "due_date": "2026-10-15",
-                "renewals_used": 1,
-            },
+            {"item_id": "BK-1003", "title": "The Great Gatsby", "due_date": "2026-10-28", "renewals_used": 0},
+            {"item_id": "BK-1010", "title": "Database System Concepts", "due_date": "2026-10-25", "renewals_used": 1},
         ],
-    }
+    },
+    "P-50192": {
+        "card_number": "P-50192",
+        "name": "Sara Khan",
+        "email": "sara.khan@nu.edu.pk",
+        "status": "active",
+        "loans": [
+            {"item_id": "BK-1025", "title": "Algorithms", "due_date": "2026-11-03", "renewals_used": 0},
+        ],
+    },
 }
 
 
@@ -157,12 +88,13 @@ class RecordsDatabase:
     def reset_database(self) -> None:
         """Reset the JSON database to pristine initial state."""
         self.filepath.parent.mkdir(parents=True, exist_ok=True)
+        catalogue = build_catalogue_from_documents()
         data = {
-            "catalogue": INITIAL_CATALOGUE,
-            "patrons": INITIAL_PATRONS,
+            "catalogue": catalogue,
+            "patrons": copy.deepcopy(INITIAL_PATRONS),
             "metadata": {
                 "updated_at": datetime.now().isoformat(),
-                "total_books": len(INITIAL_CATALOGUE),
+                "total_books": len(catalogue),
             },
         }
         self._save_raw(data)
@@ -215,6 +147,53 @@ class RecordsDatabase:
                 ):
                     matches.append(b)
             return matches
+
+    async def search_catalogue(
+        self, query: str, author: str | None = None, available_only: bool = False, limit: int = 5
+    ) -> dict[str, Any]:
+        """
+        search_catalogue tool: keyword search over the LIVE catalogue (status and
+        due dates change when books are issued/returned, unlike the RAG documents).
+        Books containing ALL query words come first; if none do, books containing
+        ANY of them are returned, ranked by how many words matched.
+        """
+        stop = {"the", "a", "an", "of", "and", "book", "books", "by", "on", "for", "to", "in"}
+        words = [w for w in re.findall(r"[a-z0-9]+", query.lower()) if w not in stop]
+        limit = max(1, min(int(limit or 5), 10))
+        async with self._lock:
+            catalogue = self._read_raw().get("catalogue", [])
+
+        scored = []
+        for book in catalogue:
+            text = f"{book['id']} {book['title']} {book.get('author', '')}".lower()
+            if author and author.lower() not in book.get("author", "").lower():
+                continue
+            if available_only and book.get("status") != "available":
+                continue
+            hits = sum(1 for w in words if w in text)
+            if hits or not words:
+                scored.append((hits, book))
+        exact = [b for hits, b in scored if hits == len(words)]
+        ranked = exact or [b for _, b in sorted(scored, key=lambda x: -x[0])]
+
+        results = [
+            {
+                "id": b["id"],
+                "title": b["title"],
+                "author": b.get("author", ""),
+                "location": b.get("location", ""),
+                "status": b.get("status", ""),
+                **({"due_date": b["due_date"]} if b.get("status") == "checked_out" else {}),
+            }
+            for b in ranked[:limit]
+        ]
+        return {
+            "success": True,
+            "query": query,
+            "count": len(results),
+            "results": results,
+            "message": "" if results else f"No catalogue items match '{query}'.",
+        }
 
     async def find_book(self, identifier: str) -> dict[str, Any] | None:
         ident = identifier.lower().strip()

@@ -3,12 +3,11 @@
     {
       "id": "BK-1001",
       "title": "Introduction to Algorithms",
-      "author": "Cormen, Leiserson, Rivest, Stein",
+      "author": "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein",
       "location": "Stacks A / QA76.9.A43",
       "status": "available",
       "due_date": null,
-      "borrowed_by": null,
-      "category": "computer_science"
+      "borrowed_by": null
     },
     {
       "id": "BK-1002",
@@ -17,8 +16,7 @@
       "location": "Stacks B / P98",
       "status": "available",
       "due_date": null,
-      "borrowed_by": null,
-      "category": "nlp_ai"
+      "borrowed_by": null
     },
     {
       "id": "BK-1003",
@@ -26,19 +24,17 @@
       "author": "F. Scott Fitzgerald",
       "location": "Fiction / FIC FIT",
       "status": "checked_out",
-      "due_date": "2026-09-22",
-      "borrowed_by": "P-78421",
-      "category": "fiction"
+      "due_date": "2026-12-30",
+      "borrowed_by": "P-78421"
     },
     {
       "id": "BK-1004",
-      "title": "Clean Code",
+      "title": "Clean Code: A Handbook of Agile Software Craftsmanship",
       "author": "Robert C. Martin",
       "location": "Stacks A / QA76.73",
       "status": "available",
       "due_date": null,
-      "borrowed_by": null,
-      "category": "software_engineering"
+      "borrowed_by": null
     },
     {
       "id": "BK-1005",
@@ -47,58 +43,322 @@
       "location": "Fiction / FIC AUS",
       "status": "on_hold",
       "due_date": null,
-      "borrowed_by": null,
-      "category": "fiction"
+      "borrowed_by": null
     },
     {
       "id": "BK-1006",
       "title": "Deep Learning",
-      "author": "Goodfellow, Bengio, Courville",
-      "location": "Reference (library use only)",
+      "author": "Ian Goodfellow, Yoshua Bengio, Aaron Courville",
+      "location": "Reference / R-QA76.87",
       "status": "reference_only",
       "due_date": null,
-      "borrowed_by": null,
-      "category": "ai_ml"
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1007",
+      "title": "Computer Networks: A Top-Down Approach",
+      "author": "James F. Kurose, Keith W. Ross",
+      "location": "Stacks A / TK5105.5",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1008",
+      "title": "Operating Systems: Three Easy Pieces",
+      "author": "Remzi H. Arpaci-Dusseau, Andrea C. Arpaci-Dusseau",
+      "location": "Stacks A / QA76.76.O63",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1009",
+      "title": "Artificial Intelligence: A Modern Approach",
+      "author": "Stuart Russell, Peter Norvig",
+      "location": "Stacks B / Q335",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
     },
     {
       "id": "BK-1010",
       "title": "Database System Concepts",
-      "author": "Silberschatz, Korth, Sudarshan",
+      "author": "Abraham Silberschatz, Henry F. Korth, S. Sudarshan",
       "location": "Stacks A / QA76.9.D3",
       "status": "checked_out",
-      "due_date": "2026-09-18",
-      "borrowed_by": "P-78421",
-      "category": "databases"
+      "due_date": "2026-10-25",
+      "borrowed_by": "P-78421"
     },
     {
       "id": "BK-1011",
-      "title": "Design Patterns",
-      "author": "Gamma, Helm, Johnson, Vlissides",
-      "location": "Stacks A / QA76.76.D47",
+      "title": "Design Patterns: Elements of Reusable Object-Oriented Software",
+      "author": "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides",
+      "location": "Stacks A / QA76.64",
       "status": "available",
       "due_date": null,
-      "borrowed_by": null,
-      "category": "software_engineering"
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1012",
+      "title": "Probability and Statistics for Engineering and the Sciences",
+      "author": "Jay L. Devore",
+      "location": "Stacks B / QA273",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1013",
+      "title": "Linear Algebra and Its Applications",
+      "author": "Gilbert Strang",
+      "location": "Stacks B / QA184.2",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1014",
+      "title": "Discrete Mathematics and Its Applications",
+      "author": "Kenneth H. Rosen",
+      "location": "Stacks B / QA39.3",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1015",
+      "title": "Computer Organization and Design: The Hardware/Software Interface",
+      "author": "David A. Patterson, John L. Hennessy",
+      "location": "Stacks A / QA76.5",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1016",
+      "title": "Software Engineering",
+      "author": "Ian Sommerville",
+      "location": "Stacks A / QA76.758",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1017",
+      "title": "Compilers: Principles, Techniques, and Tools",
+      "author": "Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman",
+      "location": "Stacks A / QA76.76.C65",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
     },
     {
       "id": "BK-1018",
       "title": "Pattern Recognition and Machine Learning",
       "author": "Christopher M. Bishop",
-      "location": "Stacks B / Q325.5",
+      "location": "Reference / R-Q327",
+      "status": "reference_only",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1019",
+      "title": "Python Crash Course",
+      "author": "Eric Matthes",
+      "location": "Stacks A / QA76.73.P98",
       "status": "available",
       "due_date": null,
-      "borrowed_by": null,
-      "category": "ai_ml"
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1020",
+      "title": "Python Data Science Handbook",
+      "author": "Jake VanderPlas",
+      "location": "Stacks A / QA76.9.D343",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
     },
     {
       "id": "BK-1021",
-      "title": "The Pragmatic Programmer",
+      "title": "The Pragmatic Programmer: Your Journey to Mastery",
       "author": "David Thomas, Andrew Hunt",
       "location": "Stacks A / QA76.6",
       "status": "available",
       "due_date": null,
-      "borrowed_by": null,
-      "category": "software_engineering"
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1022",
+      "title": "Calculus: Early Transcendentals",
+      "author": "James Stewart",
+      "location": "Stacks B / QA303.2",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1023",
+      "title": "Introduction to the Theory of Computation",
+      "author": "Michael Sipser",
+      "location": "Stacks A / QA267.7",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1024",
+      "title": "Data Communications and Networking",
+      "author": "Behrouz A. Forouzan",
+      "location": "Stacks A / TK5105",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1025",
+      "title": "Algorithms",
+      "author": "Robert Sedgewick, Kevin Wayne",
+      "location": "Stacks A / QA76.9.A43",
+      "status": "checked_out",
+      "due_date": "2026-11-03",
+      "borrowed_by": "P-50192"
+    },
+    {
+      "id": "BK-1026",
+      "title": "Computer Vision: Algorithms and Applications",
+      "author": "Richard Szeliski",
+      "location": "Stacks B / TA1634",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1027",
+      "title": "Computer Security: Art and Science",
+      "author": "Matt Bishop",
+      "location": "Stacks B / QA76.9.A25",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1028",
+      "title": "Digital Design",
+      "author": "M. Morris Mano, Michael D. Ciletti",
+      "location": "Stacks A / TK7888.3",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1029",
+      "title": "Signals and Systems",
+      "author": "Alan V. Oppenheim, Alan S. Willsky",
+      "location": "Stacks B / TK5102.5",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1030",
+      "title": "The Lean Startup",
+      "author": "Eric Ries",
+      "location": "Stacks B / HD62.5",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1031",
+      "title": "Data Mining: Concepts and Techniques",
+      "author": "Jiawei Han, Micheline Kamber, Jian Pei",
+      "location": "Stacks A / QA76.9.D343",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1032",
+      "title": "Network Security Essentials: Applications and Standards",
+      "author": "William Stallings",
+      "location": "Stacks B / TK5105.59",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1033",
+      "title": "Mobile Application Development with Android",
+      "author": "Jerome F. DiMarzio",
+      "location": "Stacks A / QA76.59",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1034",
+      "title": "Cloud Computing: Concepts, Technology and Architecture",
+      "author": "Thomas Erl, Ricardo Puttini, Zaigham Mahmood",
+      "location": "Stacks A / QA76.585",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1035",
+      "title": "Learning Spark: Lightning-Fast Data Analytics",
+      "author": "Jules S. Damji, Brooke Wenig, Tathagata Das, Denny Lee",
+      "location": "Stacks A / QA76.9.D343",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1036",
+      "title": "Management Information Systems: Managing the Digital Firm",
+      "author": "Kenneth C. Laudon, Jane P. Laudon",
+      "location": "Stacks B / HD30.2",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1037",
+      "title": "Financial Accounting: An Introduction to Concepts, Methods and Uses",
+      "author": "Roman L. Weil, Katherine Schipper, Jennifer Francis",
+      "location": "Stacks B / HF5636",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1038",
+      "title": "Principles of Marketing",
+      "author": "Philip Kotler, Gary Armstrong",
+      "location": "Stacks B / HF5415.13",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1039",
+      "title": "Designing the User Interface: Strategies for Effective HCI",
+      "author": "Ben Shneiderman, Catherine Plaisant",
+      "location": "Stacks A / QA76.9.H85",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
+    },
+    {
+      "id": "BK-1040",
+      "title": "University Physics with Modern Physics",
+      "author": "Hugh D. Young, Roger A. Freedman",
+      "location": "Stacks B / QC21.3",
+      "status": "available",
+      "due_date": null,
+      "borrowed_by": null
     }
   ],
   "patrons": {
@@ -111,20 +371,40 @@
         {
           "item_id": "BK-1003",
           "title": "The Great Gatsby",
-          "due_date": "2026-10-18",
-          "renewals_used": 0
+          "due_date": "2026-12-30",
+          "renewals_used": 1
         },
         {
           "item_id": "BK-1010",
           "title": "Database System Concepts",
-          "due_date": "2026-10-15",
+          "due_date": "2026-10-25",
           "renewals_used": 1
         }
       ]
+    },
+    "P-50192": {
+      "card_number": "P-50192",
+      "name": "Sara Khan",
+      "email": "sara.khan@nu.edu.pk",
+      "status": "active",
+      "loans": [
+        {
+          "item_id": "BK-1025",
+          "title": "Algorithms",
+          "due_date": "2026-11-03",
+          "renewals_used": 0
+        }
+      ]
+    },
+    "P-99999": {
+      "card_number": "P-99999",
+      "name": "Patron (P-99999)",
+      "status": "active",
+      "loans": []
     }
   },
   "metadata": {
-    "updated_at": "2026-10-11T19:36:18.024456",
-    "total_books": 10
+    "updated_at": "2026-10-25T22:04:13.581695",
+    "total_books": 40
   }
 }

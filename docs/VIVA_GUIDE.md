@@ -102,7 +102,17 @@ There is no keyword regex any more (Assignment 2 used one): the LLM decides. Str
 
 ---
 
-## 7. Likely viva questions
+## 7. Latency: what we measured and why
+
+On our i7-8550U (no GPU): ASR ~0.8 s, retrieval ~17 ms, tools ~1 ms, TTS first sentence ~0.5 s, but LLM first token ~6.7 s (mean), so end of speech → first audio ≈ 9.8 s mean (best 3.6 s). The target of ~2 s is not met; the LLM is the bottleneck (see README §9, docs/BENCHMARKS.md).
+
+**Prompt caching (good viva topic):** Ollama keeps the computed state (KV cache) of the last prompt. If a new request starts with the same tokens, it skips re-reading them. Our fixed start is system prompt + tool schemas (~1,100 tokens, ~12–30 s to read on this CPU!). We (1) warm up at startup *with the tools* so this start is cached, and (2) put everything that changes each turn (date/time, retrieved text) at the *end* of the conversation, in the user message. Before fix (2) the time note sat in a system message, which the chat template merges into the top block, so every new minute invalidated the cache: mean latency went 21.1 s → 9.8 s after the fix.
+
+**Why qwen2.5:1.5b and not llama3.2:3b?** Measured: ~2.5× faster generation and it chose tools correctly (2/2 vs 0/2). Smaller models still fill arguments wrongly sometimes; schema validation + clear error messages keep that safe.
+
+---
+
+## 8. Likely viva questions
 
 1. **Why does voice not need its own chat logic?** After `transcript_final` the text calls the same `_run_turn()` → `manager.stream_reply()` with the same `session_id` as typed messages.
 2. **Why send audio as binary frames, not base64 JSON?** It's 33% smaller and has no encode/decode cost at ~31 frames/s. (Server→client audio is base64 JSON so it carries `seq` and `sample_rate` in one frame.)
@@ -116,6 +126,6 @@ There is no keyword regex any more (Assignment 2 used one): the LLM decides. Str
 10. **What stops an infinite tool loop?** Max 2 tool rounds; the final call has no tools, so it must answer in text.
 11. **What happens on a tool timeout?** `asyncio.wait_for` raises `TimeoutError`, which becomes `{"success": false, "error": ...}`. The LLM explains it, and the turn finishes normally (tested with a deliberately slow fake tool).
 12. **How do you avoid double-booking a study room with two users?** All bookings go through one `asyncio.Lock`; the overlap check and the atomic write happen inside it.
-13. **Why tiny.en and the "low" Piper voice?** CPU-only laptop and a slow network: tiny.en is about 2× faster than base.en, and the 16 kHz voice is faster to synthesise. Accuracy is lower but fine for short library questions.
+13. **Why tiny.en and the "low" Piper voice?** CPU-only laptop: tiny.en (~0.7 s per question) is about 2× faster than base.en and half the download; the 16 kHz voice synthesises a sentence in ~0.2–0.3 s. Accuracy is lower (e.g. "304" heard as "300") but fine for short library questions.
 14. **What does eos_to_first_audio_ms measure?** From the moment the VAD declares end of speech to the moment the first audio chunk is sent. The user also waits the 600 ms silence window before that.
 15. **How do you know two users don't block each other?** `scripts/concurrency_test.py` runs voice+text and voice+voice at the same time and prints both users' latencies.

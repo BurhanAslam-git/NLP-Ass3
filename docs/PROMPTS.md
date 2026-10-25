@@ -7,7 +7,12 @@ Every instruction we gave is recorded here with its date and outcome, so we can 
 
 ## Prompt 5 — Team members, commit and push now (2026-10-25)
 
-**Outcome:** Phases I, II and IV committed as separate commits and pushed to GitHub; then continued with the flaky test, Chrome check, benchmarks, README, docs.
+**Outcome:** Phases I, II and IV committed and pushed separately (after fixing a `.gitignore` rule that hid `backend/app/models`). Then:
+- Flaky test: caused by LLM wording plus a real runaway generation (one reply ran > 6 min) → added `num_predict`/`repeat_penalty`, a "Do you have X = the library" prompt line, loosened the test wording. Phase III committed (55/55 tests).
+- "Chrome check": no browser/microphone available to the assistant, so it started the real app and drove it like the browser (page + scripts load, full voice turns over the WebSocket via `benchmark_voice.py`). Manual mic test in Chrome left to us.
+- Benchmarks: found the LLM prompt cache was invalidated every minute by a per-turn time note in a system message → moved into the user message; warm-up now includes tool schemas. End of speech → first audio mean 21.1 s → 9.8 s. Concurrency test run. Phase V committed.
+- Captured real tool invocations for the README; fixed problems they revealed (timestamp dates, missing start_time, card number copied from the schema example, tests changing real data → `tests/conftest.py`).
+- README for all three assignments written and pushed. CRM bonus not attempted (deadline).
 
 ```text
 Team members for the README:

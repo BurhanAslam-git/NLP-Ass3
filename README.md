@@ -250,7 +250,7 @@ Real run:
 {"type": "object",
  "properties": {
    "action": {"type": "string", "enum": ["list_availability", "book", "cancel", "my_bookings"]},
-   "card_number": {"type": "string", "description": "Card number, e.g. P-78421"},
+   "card_number": {"type": "string", "description": "The card number the patron gave (format P-12345). Never guess it."},
    "room_id": {"type": "string", "description": "301-306"},
    "date": {"type": "string", "description": "YYYY-MM-DD"},
    "start_time": {"type": "string", "description": "HH:MM 24h, required to book"},
@@ -270,10 +270,12 @@ A failed real run, showing failure handling: for "Please book study room 304 for
 
 | Tool | Description | Required args |
 |---|---|---|
-| `check_patron_loans` | A patron's current loans and due dates | `card_number` |
+| `check_patron_loans` | The patron's own current loans, only if they gave their card number | `card_number` |
 | `issue_book` | Check out an available book (21 days, max 10 loans) | `card_number`, `book_title_or_id` |
 | `renew_book` | Renew a loan by 21 days (max 2 renewals) | `card_number`, `book_title_or_id` |
 | `return_book` | Return a borrowed book | `card_number`, `book_title_or_id` |
+
+(The real runs above were captured before the last wording tweaks to the schema descriptions; behaviour is the same.)
 
 Real run: "Card P-78421: which books do I have on loan and when are they due?" → `check_patron_loans {"card_number": "P-78421"}` → The Great Gatsby due 2026-10-28, Database System Concepts due 2026-10-25 → the assistant lists both.
 

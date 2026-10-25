@@ -43,8 +43,10 @@ def _chat(user_text: str) -> str:
 def test_c1_speech_book_catalogue_row() -> None:
     reply = _chat("Do you have Speech and Language Processing?").lower()
     assert "speech and language processing" in reply
-    assert "available" in reply
+    # The LLM may phrase availability either way ("available" / "in stock").
+    assert "available" in reply or "in stock" in reply
     assert "don't have" not in reply
+    assert "do not have" not in reply
     assert "not in the catalogue" not in reply
 
 

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     request_timeout_seconds: float = 120.0
     ollama_keep_alive: str = "30m"   # keep the model loaded in RAM between turns
     ollama_num_ctx: int = 4096       # context window sent to Ollama
+    ollama_num_predict: int = 300    # cap reply length: stops runaway/repeating generations
 
     # Session management
     max_server_sessions: int = 128

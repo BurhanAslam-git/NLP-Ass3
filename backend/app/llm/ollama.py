@@ -79,6 +79,8 @@ class OllamaEngine:
             "options": {
                 "temperature": 0.3,
                 "num_ctx": settings.ollama_num_ctx,
+                "num_predict": settings.ollama_num_predict,  # never generate forever
+                "repeat_penalty": 1.15,                      # discourage repetition loops
             },
         }
         if tools:
